@@ -948,7 +948,7 @@ Status FlushJob::WriteLevel0Table() {
         RecordTick(stats_, MEMTABLE_GARBAGE_BYTES_AT_FLUSH,
                    memtable_garbage_bytes);
       }
-      LogFlush(db_options_.info_log);
+      DoLogFlush(db_options_.info_log);
     }
     ROCKS_LOG_INFO(db_options_.info_log,
                    "[%s] [JOB %d] Level-0 flush table #%" PRIu64 ": %" PRIu64

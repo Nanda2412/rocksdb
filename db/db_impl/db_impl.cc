@@ -690,7 +690,7 @@ Status DBImpl::CloseHelper() {
   }
 
   ROCKS_LOG_INFO(immutable_db_options_.info_log, "Shutdown complete");
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
 
 #ifndef ROCKSDB_LITE
   // If the sst_file_manager was allocated by us during DB::Open(), ccall
@@ -1026,7 +1026,7 @@ void DBImpl::FlushInfoLog() {
     return;
   }
   TEST_SYNC_POINT("DBImpl::FlushInfoLog:StartRunning");
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
 }
 
 Status DBImpl::TablesRangeTombstoneSummary(ColumnFamilyHandle* column_family,
@@ -1126,7 +1126,7 @@ Status DBImpl::SetOptions(
     ROCKS_LOG_WARN(immutable_db_options_.info_log, "[%s] SetOptions() failed",
                    cfd->GetName().c_str());
   }
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   return s;
 #endif  // ROCKSDB_LITE
 }
@@ -1280,7 +1280,7 @@ Status DBImpl::SetDBOptions(
   } else {
     ROCKS_LOG_WARN(immutable_db_options_.info_log, "SetDBOptions failed");
   }
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   return s;
 #endif  // ROCKSDB_LITE
 }
@@ -3783,7 +3783,7 @@ Status DBImpl::DeleteFile(std::string name) {
     FindObsoleteFiles(&job_context, false);
   }  // lock released here
 
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   // remove files outside the db-lock
   if (job_context.HaveSomethingToDelete()) {
     // Call PurgeObsoleteFiles() without holding mutex.
@@ -3874,7 +3874,7 @@ Status DBImpl::DeleteFilesInRanges(ColumnFamilyHandle* column_family,
     FindObsoleteFiles(&job_context, false);
   }  // lock released here
 
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   // remove files outside the db-lock
   if (job_context.HaveSomethingToDelete()) {
     // Call PurgeObsoleteFiles() without holding mutex.

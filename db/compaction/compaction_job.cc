@@ -889,7 +889,7 @@ Status CompactionJob::Run() {
   UpdateCompactionStats();
 
   RecordCompactionIOStats();
-  LogFlush(db_options_.info_log);
+  DoLogFlush(db_options_.info_log);
   TEST_SYNC_POINT("CompactionJob::Run():End");
 
   compact_->status = status;
@@ -2235,7 +2235,7 @@ Status CompactionJob::OpenCompactionOutputFile(
         " fails at NewWritableFile with status %s",
         sub_compact->compaction->column_family_data()->GetName().c_str(),
         job_id_, file_number, s.ToString().c_str());
-    LogFlush(db_options_.info_log);
+    DoLogFlush(db_options_.info_log);
     EventHelpers::LogAndNotifyTableFileCreationFinished(
         event_logger_, cfd->ioptions()->listeners, dbname_, cfd->GetName(),
         fname, job_id_, FileDescriptor(), kInvalidBlobFileNumber,
@@ -2309,7 +2309,7 @@ Status CompactionJob::OpenCompactionOutputFile(
       file_number);
   sub_compact->builder.reset(
       NewTableBuilder(tboptions, sub_compact->outfile.get()));
-  LogFlush(db_options_.info_log);
+  DoLogFlush(db_options_.info_log);
   return s;
 }
 
@@ -2582,7 +2582,7 @@ Status CompactionServiceCompactionJob::Run() {
   UpdateCompactionStats();
   RecordCompactionIOStats();
 
-  LogFlush(db_options_.info_log);
+  DoLogFlush(db_options_.info_log);
   compact_->status = status;
   compact_->status.PermitUncheckedError();
 

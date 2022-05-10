@@ -4543,7 +4543,7 @@ Status VersionSet::ProcessManifestWrites(
       TEST_SYNC_POINT("VersionSet::LogAndApply::ColumnFamilyDrop:2");
     }
 
-    LogFlush(db_options_->info_log);
+    DoLogFlush(db_options_->info_log);
     TEST_SYNC_POINT("VersionSet::LogAndApply:WriteManifestDone");
     mu->Lock();
   }

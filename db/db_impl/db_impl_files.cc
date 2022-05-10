@@ -90,7 +90,7 @@ Status DBImpl::EnableFileDeletions(bool force) {
                    saved_counter);
   }
   job_context.Clean();
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   return Status::OK();
 }
 
@@ -636,7 +636,7 @@ void DBImpl::PurgeObsoleteFiles(JobContext& state, bool schedule_only) {
 #ifndef ROCKSDB_LITE
   wal_manager_.PurgeObsoleteWALFiles();
 #endif  // ROCKSDB_LITE
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   InstrumentedMutexLock l(&mutex_);
   --pending_purge_obsolete_files_;
   assert(pending_purge_obsolete_files_ >= 0);

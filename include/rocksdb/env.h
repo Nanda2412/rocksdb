@@ -1267,7 +1267,7 @@ class DynamicLibrary {
   virtual Status LoadSymbol(const std::string& sym_name, void** func) = 0;
 };
 
-extern void LogFlush(const std::shared_ptr<Logger>& info_log);
+extern void DoLogFlush(const std::shared_ptr<Logger>& info_log);
 
 extern void Log(const InfoLogLevel log_level,
                 const std::shared_ptr<Logger>& info_log, const char* format,
@@ -1292,7 +1292,7 @@ extern void Fatal(const std::shared_ptr<Logger>& info_log, const char* format,
 extern void Log(const std::shared_ptr<Logger>& info_log, const char* format,
                 ...) ROCKSDB_PRINTF_FORMAT_ATTR(2, 3);
 
-extern void LogFlush(Logger* info_log);
+extern void DoLogFlush(Logger* info_log);
 
 extern void Log(const InfoLogLevel log_level, Logger* info_log,
                 const char* format, ...) ROCKSDB_PRINTF_FORMAT_ATTR(3, 4);

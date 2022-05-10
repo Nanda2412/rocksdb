@@ -990,7 +990,7 @@ Status DBImpl::CompactRangeInternal(const CompactRangeOptions& options,
     }
     Status s = IncreaseFullHistoryTsLowImpl(cfd, ts_low);
     if (!s.ok()) {
-      LogFlush(immutable_db_options_.info_log);
+      DoLogFlush(immutable_db_options_.info_log);
       return s;
     }
   }
@@ -1023,7 +1023,7 @@ Status DBImpl::CompactRangeInternal(const CompactRangeOptions& options,
                         false /* writes_stopped*/);
     }
     if (!s.ok()) {
-      LogFlush(immutable_db_options_.info_log);
+      DoLogFlush(immutable_db_options_.info_log);
       return s;
     }
   }
@@ -1149,7 +1149,7 @@ Status DBImpl::CompactRangeInternal(const CompactRangeOptions& options,
     }
   }
   if (!s.ok() || final_output_level == kInvalidLevel) {
-    LogFlush(immutable_db_options_.info_log);
+    DoLogFlush(immutable_db_options_.info_log);
     return s;
   }
 
@@ -1173,7 +1173,7 @@ Status DBImpl::CompactRangeInternal(const CompactRangeOptions& options,
     TEST_SYNC_POINT(
         "DBImpl::CompactRange:PostRefitLevel:ManualCompactionEnabled");
   }
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
 
   {
     InstrumentedMutexLock l(&mutex_);
@@ -2834,7 +2834,7 @@ void DBImpl::BackgroundCallFlush(Env::Priority thread_pri) {
                       "Accumulated background error counts: %" PRIu64,
                       s.ToString().c_str(), error_cnt);
       log_buffer.FlushBufferToLog();
-      LogFlush(immutable_db_options_.info_log);
+      DoLogFlush(immutable_db_options_.info_log);
       immutable_db_options_.clock->SleepForMicroseconds(1000000);
       mutex_.Lock();
     }
@@ -2926,7 +2926,7 @@ void DBImpl::BackgroundCallCompaction(PrepickedCompaction* prepicked_compaction,
                       "Waiting after background compaction error: %s, "
                       "Accumulated background error counts: %" PRIu64,
                       s.ToString().c_str(), error_cnt);
-      LogFlush(immutable_db_options_.info_log);
+      DoLogFlush(immutable_db_options_.info_log);
       immutable_db_options_.clock->SleepForMicroseconds(1000000);
       mutex_.Lock();
     } else if (s.IsManualCompactionPaused()) {

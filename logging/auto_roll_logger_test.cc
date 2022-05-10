@@ -438,7 +438,7 @@ TEST_F(AutoRollLoggerTest, AutoDeleting) {
   }
 }
 
-TEST_F(AutoRollLoggerTest, LogFlushWhileRolling) {
+TEST_F(AutoRollLoggerTest, DoLogFlushWhileRolling) {
   DBOptions options;
   std::shared_ptr<Logger> logger;
 
@@ -461,7 +461,7 @@ TEST_F(AutoRollLoggerTest, LogFlushWhileRolling) {
   //     are enabled in flush_thread (the one pinning the old logger).
   ROCKSDB_NAMESPACE::SyncPoint::GetInstance()->LoadDependencyAndMarkers(
       {{"AutoRollLogger::Flush:PinnedLogger",
-        "AutoRollLoggerTest::LogFlushWhileRolling:PreRollAndPostThreadInit"},
+        "AutoRollLoggerTest::DoLogFlushWhileRolling:PreRollAndPostThreadInit"},
        {"PosixLogger::Flush:Begin1",
         "AutoRollLogger::ResetLogger:BeforeNewLogger"},
        {"AutoRollLogger::ResetLogger:AfterNewLogger",
@@ -472,9 +472,9 @@ TEST_F(AutoRollLoggerTest, LogFlushWhileRolling) {
 
   flush_thread = port::Thread([&]() { auto_roll_logger->Flush(); });
   TEST_SYNC_POINT(
-      "AutoRollLoggerTest::LogFlushWhileRolling:PreRollAndPostThreadInit");
+      "AutoRollLoggerTest::DoLogFlushWhileRolling:PreRollAndPostThreadInit");
   RollLogFileBySizeTest(auto_roll_logger, options.max_log_file_size,
-                        kSampleMessage + ":LogFlushWhileRolling");
+                        kSampleMessage + ":DoLogFlushWhileRolling");
   flush_thread.join();
   ROCKSDB_NAMESPACE::SyncPoint::GetInstance()->DisableProcessing();
 }
@@ -627,7 +627,7 @@ TEST_F(AutoRollLoggerTest, LogHeaderTest) {
     }
 
     // Flush the log for the latest file
-    LogFlush(&logger);
+    DoLogFlush(&logger);
 
     const auto oldfiles = GetOldFileNames(newfname);
 

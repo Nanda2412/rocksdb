@@ -703,7 +703,7 @@ std::shared_ptr<BlobFile> BlobDBImpl::NewBlobFile(
 
   ROCKS_LOG_DEBUG(db_options_.info_log, "New blob file created: %s reason='%s'",
                   blob_file->PathName().c_str(), reason.c_str());
-  LogFlush(db_options_.info_log);
+  DoLogFlush(db_options_.info_log);
 
   return blob_file;
 }

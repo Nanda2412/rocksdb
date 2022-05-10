@@ -24,7 +24,7 @@ DBImplReadOnly::DBImplReadOnly(const DBOptions& db_options,
              /*batch_per_txn*/ true, /*read_only*/ true) {
   ROCKS_LOG_INFO(immutable_db_options_.info_log,
                  "Opening the db in read only mode");
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
 }
 
 DBImplReadOnly::~DBImplReadOnly() {}

@@ -176,7 +176,7 @@ Status CompactedDBImpl::Open(const Options& options,
   if (s.ok()) {
     ROCKS_LOG_INFO(db->immutable_db_options_.info_log,
                    "Opened the db as fully compacted mode");
-    LogFlush(db->immutable_db_options_.info_log);
+    DoLogFlush(db->immutable_db_options_.info_log);
     *dbptr = db.release();
   }
   return s;

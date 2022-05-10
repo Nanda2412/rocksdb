@@ -148,7 +148,7 @@ Status DBImpl::PromoteL0(ColumnFamilyHandle* column_family, int target_level) {
                                          *cfd->GetLatestMutableCFOptions());
     }
   }  // lock released here
-  LogFlush(immutable_db_options_.info_log);
+  DoLogFlush(immutable_db_options_.info_log);
   job_context.Clean();
 
   return status;

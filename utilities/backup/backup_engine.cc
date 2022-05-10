@@ -992,7 +992,7 @@ BackupEngineImpl::~BackupEngineImpl() {
   for (auto& t : threads_) {
     t.join();
   }
-  LogFlush(options_.info_log);
+  DoLogFlush(options_.info_log);
   for (const auto& it : corrupt_backups_) {
     it.second.first.PermitUncheckedError();
   }

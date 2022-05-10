@@ -865,7 +865,7 @@ Status Logger::CloseImpl() { return Status::NotSupported(); }
 FileLock::~FileLock() {
 }
 
-void LogFlush(Logger *info_log) {
+void DoLogFlush(Logger *info_log) {
   if (info_log) {
     info_log->Flush();
   }
@@ -1012,8 +1012,8 @@ void Fatal(Logger* info_log, const char* format, ...) {
   va_end(ap);
 }
 
-void LogFlush(const std::shared_ptr<Logger>& info_log) {
-  LogFlush(info_log.get());
+void DoLogFlush(const std::shared_ptr<Logger>& info_log) {
+  DoLogFlush(info_log.get());
 }
 
 void Log(const InfoLogLevel log_level, const std::shared_ptr<Logger>& info_log,
