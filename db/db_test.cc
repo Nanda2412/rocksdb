@@ -1844,6 +1844,8 @@ TEST_F(DBTest, Snapshot) {
     uint64_t time_snap1 = GetTimeOldestSnapshots();
     ASSERT_GT(time_snap1, 0U);
     ASSERT_EQ(GetSequenceOldestSnapshots(), s1->GetSequenceNumber());
+    ASSERT_EQ(GetTimeOldestSnapshots(),
+              static_cast<uint64_t>(s1->GetUnixTime()));
     ASSERT_OK(Put(0, "foo", "0v2"));
     ASSERT_OK(Put(1, "foo", "1v2"));
 
@@ -1853,6 +1855,8 @@ TEST_F(DBTest, Snapshot) {
     ASSERT_EQ(2U, GetNumSnapshots());
     ASSERT_EQ(time_snap1, GetTimeOldestSnapshots());
     ASSERT_EQ(GetSequenceOldestSnapshots(), s1->GetSequenceNumber());
+    ASSERT_EQ(GetTimeOldestSnapshots(),
+              static_cast<uint64_t>(s1->GetUnixTime()));
     ASSERT_OK(Put(0, "foo", "0v3"));
     ASSERT_OK(Put(1, "foo", "1v3"));
 
@@ -1861,6 +1865,8 @@ TEST_F(DBTest, Snapshot) {
       ASSERT_EQ(3U, GetNumSnapshots());
       ASSERT_EQ(time_snap1, GetTimeOldestSnapshots());
       ASSERT_EQ(GetSequenceOldestSnapshots(), s1->GetSequenceNumber());
+      ASSERT_EQ(GetTimeOldestSnapshots(),
+                static_cast<uint64_t>(s1->GetUnixTime()));
 
       ASSERT_OK(Put(0, "foo", "0v4"));
       ASSERT_OK(Put(1, "foo", "1v4"));
@@ -1877,6 +1883,8 @@ TEST_F(DBTest, Snapshot) {
     ASSERT_EQ(2U, GetNumSnapshots());
     ASSERT_EQ(time_snap1, GetTimeOldestSnapshots());
     ASSERT_EQ(GetSequenceOldestSnapshots(), s1->GetSequenceNumber());
+    ASSERT_EQ(GetTimeOldestSnapshots(),
+              static_cast<uint64_t>(s1->GetUnixTime()));
     ASSERT_EQ("0v1", Get(0, "foo", s1));
     ASSERT_EQ("1v1", Get(1, "foo", s1));
     ASSERT_EQ("0v2", Get(0, "foo", s2));
@@ -1892,6 +1900,8 @@ TEST_F(DBTest, Snapshot) {
     ASSERT_EQ(1U, GetNumSnapshots());
     ASSERT_LT(time_snap1, GetTimeOldestSnapshots());
     ASSERT_EQ(GetSequenceOldestSnapshots(), s2->GetSequenceNumber());
+    ASSERT_EQ(GetTimeOldestSnapshots(),
+              static_cast<uint64_t>(s2->GetUnixTime()));
 
     db_->ReleaseSnapshot(s2);
     ASSERT_EQ(0U, GetNumSnapshots());
@@ -2855,6 +2865,12 @@ class ModelDB : public DB {
     KVMap map_;
 
     SequenceNumber GetSequenceNumber() const override {
+      // no need to call this
+      assert(false);
+      return 0;
+    }
+
+    int64_t GetUnixTime() const override {
       // no need to call this
       assert(false);
       return 0;
@@ -7034,51 +7050,6 @@ TEST_F(DBTest, MemoryUsageWithMaxWriteBufferSizeToMaintain) {
       memory_limit_exceeded = false;
     }
   }
-}
-
-TEST_F(DBTest, ManualFlushWithStoppedWritesTest) {
-  Options options = CurrentOptions();
-
-  // Setting a small write buffer size. This will block writes
-  // rather quickly until a flush is made.
-  constexpr unsigned int memtableSize = 1000;
-  options.db_write_buffer_size = memtableSize;
-  options.max_background_flushes = 1;
-  Reopen(options);
-
-  std::atomic<bool> done(false);
-
-  // Will suppress future flushes.
-  // This simulates a situation where the writes will be stopped for any reason.
-  ASSERT_OK(dbfull()->PauseBackgroundWork());
-
-  port::Thread backgroundWriter([&]() {
-    Random rnd(301);
-    // These writes won't finish.
-    ASSERT_OK(Put("k1", rnd.RandomString(memtableSize / 2)));
-    ASSERT_OK(Put("k2", rnd.RandomString(memtableSize / 2)));
-    ASSERT_OK(Put("k3", rnd.RandomString(memtableSize / 2)));
-    ASSERT_OK(Put("k4", rnd.RandomString(memtableSize / 2)));
-    done.store(true);
-  });
-
-  env_->SleepForMicroseconds(1000000 / 2);
-  // make sure thread is stuck waiting for flush.
-  ASSERT_FALSE(done.load());
-
-  FlushOptions flushOptions;
-  flushOptions.wait = false;
-  flushOptions.allow_write_stall = true;
-
-  // This is the main goal of the test. This manual flush should not deadlock
-  // as we use wait=false, and even allow_write_stall=true for extra safety.
-  ASSERT_OK(dbfull()->Flush(flushOptions));
-
-  // This will re-allow background flushes.
-  ASSERT_OK(dbfull()->ContinueBackgroundWork());
-
-  backgroundWriter.join();
-  ASSERT_TRUE(done.load());
 }
 
 #endif
